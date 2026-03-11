@@ -1,0 +1,82 @@
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+
+interface Props {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const pieData = [
+  { name: "Protein", value: 35, color: "hsl(174, 72%, 50%)" },
+  { name: "Carbs", value: 40, color: "hsl(210, 70%, 55%)" },
+  { name: "Fat", value: 15, color: "hsl(35, 90%, 55%)" },
+  { name: "Fiber", value: 10, color: "hsl(140, 60%, 45%)" },
+];
+
+const lineData = [
+  { week: "W1", weight: 78, calories: 2200, workouts: 3 },
+  { week: "W2", weight: 77.2, calories: 2100, workouts: 4 },
+  { week: "W3", weight: 76.5, calories: 2000, workouts: 5 },
+  { week: "W4", weight: 75.8, calories: 1950, workouts: 4 },
+  { week: "W5", weight: 75, calories: 2050, workouts: 5 },
+  { week: "W6", weight: 74.2, calories: 1900, workouts: 6 },
+];
+
+const ReportsDialog = ({ open, onOpenChange }: Props) => {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="glass-strong border-glass-border/40 sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-display text-xl">Progress Reports</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Pie Chart */}
+          <div className="p-4 rounded-xl bg-muted/20 border border-glass-border/20">
+            <h4 className="font-display font-semibold mb-4">Macro Breakdown</h4>
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                  {pieData.map((entry, i) => (
+                    <Cell key={i} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ background: "hsl(220, 20%, 12%)", border: "1px solid hsl(220, 15%, 25%)", borderRadius: "0.75rem", color: "hsl(180, 20%, 95%)" }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Line Chart - Weight */}
+          <div className="p-4 rounded-xl bg-muted/20 border border-glass-border/20">
+            <h4 className="font-display font-semibold mb-4">Weight Progress (kg)</h4>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={lineData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 20%)" />
+                <XAxis dataKey="week" stroke="hsl(220, 10%, 55%)" fontSize={12} />
+                <YAxis stroke="hsl(220, 10%, 55%)" fontSize={12} domain={["dataMin - 1", "dataMax + 1"]} />
+                <Tooltip contentStyle={{ background: "hsl(220, 20%, 12%)", border: "1px solid hsl(220, 15%, 25%)", borderRadius: "0.75rem", color: "hsl(180, 20%, 95%)" }} />
+                <Line type="monotone" dataKey="weight" stroke="hsl(174, 72%, 50%)" strokeWidth={2} dot={{ fill: "hsl(174, 72%, 50%)", r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Line Chart - Workouts */}
+          <div className="p-4 rounded-xl bg-muted/20 border border-glass-border/20">
+            <h4 className="font-display font-semibold mb-4">Weekly Workouts</h4>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={lineData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 20%)" />
+                <XAxis dataKey="week" stroke="hsl(220, 10%, 55%)" fontSize={12} />
+                <YAxis stroke="hsl(220, 10%, 55%)" fontSize={12} />
+                <Tooltip contentStyle={{ background: "hsl(220, 20%, 12%)", border: "1px solid hsl(220, 15%, 25%)", borderRadius: "0.75rem", color: "hsl(180, 20%, 95%)" }} />
+                <Line type="monotone" dataKey="workouts" stroke="hsl(35, 90%, 55%)" strokeWidth={2} dot={{ fill: "hsl(35, 90%, 55%)", r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default ReportsDialog;

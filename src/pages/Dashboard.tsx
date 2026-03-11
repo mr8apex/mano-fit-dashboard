@@ -1,7 +1,11 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Dumbbell, User, LogOut, Settings, UtensilsCrossed, FileBarChart, Play, Activity, Flame } from "lucide-react";
+import { Dumbbell, User, LogOut, Settings, UtensilsCrossed, FileBarChart, Play, Activity, Flame, UserCircle } from "lucide-react";
+import DietPlanDialog from "@/components/DietPlanDialog";
+import ReportsDialog from "@/components/ReportsDialog";
+import TrainingDialog from "@/components/TrainingDialog";
+import ActivitiesDialog from "@/components/ActivitiesDialog";
 
 const quotes = [
   "The only bad workout is the one that didn't happen.",
@@ -16,6 +20,10 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [quote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
+  const [dietOpen, setDietOpen] = useState(false);
+  const [reportsOpen, setReportsOpen] = useState(false);
+  const [trainingOpen, setTrainingOpen] = useState(false);
+  const [activitiesOpen, setActivitiesOpen] = useState(false);
 
   useEffect(() => {
     if (!user) navigate("/login");
@@ -31,15 +39,14 @@ const Dashboard = () => {
   };
 
   const features = [
-    { icon: UtensilsCrossed, label: "Diet Plan", desc: "Track your nutrition", color: "from-emerald-500/20 to-teal-500/20", iconColor: "text-emerald-400" },
-    { icon: FileBarChart, label: "Reports", desc: "View your progress", color: "from-blue-500/20 to-cyan-500/20", iconColor: "text-blue-400" },
-    { icon: Play, label: "Start Training", desc: "Begin your workout", color: "from-primary/20 to-glow/20", iconColor: "text-primary" },
-    { icon: Activity, label: "Activities", desc: "Daily activity log", color: "from-orange-500/20 to-amber-500/20", iconColor: "text-orange-400" },
+    { icon: UtensilsCrossed, label: "Diet Plan", desc: "Track your nutrition", color: "from-emerald-500/20 to-teal-500/20", iconColor: "text-emerald-400", onClick: () => setDietOpen(true) },
+    { icon: FileBarChart, label: "Reports", desc: "View your progress", color: "from-blue-500/20 to-cyan-500/20", iconColor: "text-blue-400", onClick: () => setReportsOpen(true) },
+    { icon: Play, label: "Start Training", desc: "Begin your workout", color: "from-primary/20 to-glow/20", iconColor: "text-primary", onClick: () => setTrainingOpen(true) },
+    { icon: Activity, label: "Activities", desc: "Daily activity log", color: "from-orange-500/20 to-amber-500/20", iconColor: "text-orange-400", onClick: () => setActivitiesOpen(true) },
   ];
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="glass-strong sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -63,8 +70,17 @@ const Dashboard = () => {
                     <p className="text-sm font-semibold truncate">{user.name}</p>
                     <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                   </div>
-                  <button className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-muted/50 transition-colors text-foreground">
-                    <Settings className="w-4 h-4" /> Change Profile
+                  <button
+                    onClick={() => { setMenuOpen(false); navigate("/profile"); }}
+                    className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-muted/50 transition-colors text-foreground"
+                  >
+                    <UserCircle className="w-4 h-4" /> Profile
+                  </button>
+                  <button
+                    onClick={() => { setMenuOpen(false); navigate("/settings"); }}
+                    className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-muted/50 transition-colors text-foreground"
+                  >
+                    <Settings className="w-4 h-4" /> Settings
                   </button>
                   <button
                     onClick={() => { logout(); navigate("/login"); }}
@@ -79,9 +95,7 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Body */}
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-        {/* Greeting + Streak */}
         <div className="glass rounded-2xl p-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
           <div className="flex items-center gap-3 mb-2">
             <Flame className="w-6 h-6 text-orange-400" />
@@ -93,11 +107,11 @@ const Dashboard = () => {
           <p className="text-muted-foreground italic">"{quote}"</p>
         </div>
 
-        {/* 2x2 Grid */}
         <div className="grid grid-cols-2 gap-4">
           {features.map((f, i) => (
             <button
               key={f.label}
+              onClick={f.onClick}
               className="glass rounded-2xl p-6 text-left hover:glow-box transition-all duration-300 group animate-fade-in cursor-pointer"
               style={{ animationDelay: `${0.2 + i * 0.1}s` }}
             >
@@ -110,6 +124,11 @@ const Dashboard = () => {
           ))}
         </div>
       </main>
+
+      <DietPlanDialog open={dietOpen} onOpenChange={setDietOpen} />
+      <ReportsDialog open={reportsOpen} onOpenChange={setReportsOpen} />
+      <TrainingDialog open={trainingOpen} onOpenChange={setTrainingOpen} />
+      <ActivitiesDialog open={activitiesOpen} onOpenChange={setActivitiesOpen} />
     </div>
   );
 };
