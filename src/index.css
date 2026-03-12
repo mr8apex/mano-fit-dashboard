@@ -76,4 +76,19 @@
   .glow-box {
     box-shadow: 0 0 30px -5px hsl(var(--glow) / 0.3);
   }
+
+  @keyframes confetti-burst {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) translate(0, 0) scale(0.5);
+    }
+    60% {
+      opacity: 1;
+      transform: translate(-50%, -50%) translate(var(--cx), var(--cy)) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) translate(var(--cx), var(--cy)) scale(0.3);
+    }
+  }
 }
