@@ -59,23 +59,6 @@ const Settings = () => {
     });
   };
 
-  const PasswordInput = ({ value, onChange, placeholder, show, onToggle }: {
-    value: string; onChange: (v: string) => void; placeholder: string; show: boolean; onToggle: () => void;
-  }) => (
-    <div className="relative">
-      <Input
-        type={show ? "text" : "password"}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="bg-muted/30 border-glass-border/30 pr-10"
-      />
-      <button onClick={onToggle} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-        {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-      </button>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-background">
       <header className="glass-strong sticky top-0 z-50">
@@ -96,9 +79,24 @@ const Settings = () => {
             </div>
             <h3 className="font-display font-semibold text-lg">Change Password</h3>
           </div>
-          <PasswordInput value={passwords.old} onChange={v => setPasswords(p => ({ ...p, old: v }))} placeholder="Current password" show={showOld} onToggle={() => setShowOld(!showOld)} />
-          <PasswordInput value={passwords.new} onChange={v => setPasswords(p => ({ ...p, new: v }))} placeholder="New password" show={showNew} onToggle={() => setShowNew(!showNew)} />
-          <PasswordInput value={passwords.confirm} onChange={v => setPasswords(p => ({ ...p, confirm: v }))} placeholder="Confirm new password" show={showConfirm} onToggle={() => setShowConfirm(!showConfirm)} />
+          <div className="relative">
+            <Input type={showOld ? "text" : "password"} value={passwords.old} onChange={e => setPasswords(p => ({ ...p, old: e.target.value }))} placeholder="Current password" className="bg-muted/30 border-glass-border/30 pr-10" />
+            <button type="button" onClick={() => setShowOld(!showOld)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              {showOld ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+          <div className="relative">
+            <Input type={showNew ? "text" : "password"} value={passwords.new} onChange={e => setPasswords(p => ({ ...p, new: e.target.value }))} placeholder="New password" className="bg-muted/30 border-glass-border/30 pr-10" />
+            <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+          <div className="relative">
+            <Input type={showConfirm ? "text" : "password"} value={passwords.confirm} onChange={e => setPasswords(p => ({ ...p, confirm: e.target.value }))} placeholder="Confirm new password" className="bg-muted/30 border-glass-border/30 pr-10" />
+            <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
           <Button onClick={handlePasswordChange} className="w-full rounded-xl">Update Password</Button>
         </div>
 
