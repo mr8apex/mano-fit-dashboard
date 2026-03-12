@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Footprints, Flame, Timer, Droplets, Moon, MapPin, Link2, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,8 @@ const ActivitiesDialog = ({ open, onOpenChange }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong border-glass-border/40 sm:max-w-md max-h-[85vh] overflow-y-auto">
+      <DialogContent className="glass-strong border-glass-border/40 sm:max-w-md max-h-[85vh] overflow-hidden p-0">
+        <ScrollArea className="max-h-[85vh] px-6 pt-6 pb-6">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">Today's Activities</DialogTitle>
         </DialogHeader>
@@ -101,6 +103,7 @@ const ActivitiesDialog = ({ open, onOpenChange }: Props) => {
             </div>
           </div>
         </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
