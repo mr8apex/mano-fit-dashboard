@@ -103,6 +103,7 @@ const ActivitiesDialog = ({ open, onOpenChange }: Props) => {
             </div>
           </div>
         </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

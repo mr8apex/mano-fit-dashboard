@@ -76,6 +76,7 @@ const ReportsDialog = ({ open, onOpenChange }: Props) => {
             </ResponsiveContainer>
           </div>
         </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
