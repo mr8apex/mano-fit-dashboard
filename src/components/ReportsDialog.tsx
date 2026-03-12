@@ -27,11 +27,12 @@ const ReportsDialog = ({ open, onOpenChange }: Props) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="glass-strong border-glass-border/40 sm:max-w-2xl max-h-[85vh] overflow-hidden p-0">
+        <ScrollArea className="max-h-[85vh] px-6 pt-6 pb-6">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">Progress Reports</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-6 mt-4">
           {/* Pie Chart */}
           <div className="p-4 rounded-xl bg-muted/20 border border-glass-border/20">
             <h4 className="font-display font-semibold mb-4">Macro Breakdown</h4>
