@@ -59,23 +59,6 @@ const Settings = () => {
     });
   };
 
-  const PasswordInput = ({ value, onChange, placeholder, show, onToggle }: {
-    value: string; onChange: (v: string) => void; placeholder: string; show: boolean; onToggle: () => void;
-  }) => (
-    <div className="relative">
-      <Input
-        type={show ? "text" : "password"}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="bg-muted/30 border-glass-border/30 pr-10"
-      />
-      <button onClick={onToggle} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-        {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-      </button>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-background">
       <header className="glass-strong sticky top-0 z-50">
