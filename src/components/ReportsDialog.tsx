@@ -26,7 +26,7 @@ const lineData = [
 const ReportsDialog = ({ open, onOpenChange }: Props) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong border-glass-border/40 sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="glass-strong border-glass-border/40 sm:max-w-2xl max-h-[85vh] overflow-hidden p-0">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">Progress Reports</DialogTitle>
         </DialogHeader>
