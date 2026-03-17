@@ -262,7 +262,7 @@ const Signup = () => {
           <p className="text-center text-xs text-muted-foreground mb-4">{STEPS[step]}</p>
 
           <form onSubmit={handleSubmit}>
-            <ScrollArea className="max-h-[45vh]">
+            <ScrollArea className="max-h-[55vh]">
               <div className="px-1">
                 {renderStep()}
               </div>
