@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import fitnessBg from "@/assets/fitness-bg.jpg";
 import { Eye, EyeOff, Dumbbell, ChevronLeft, ChevronRight, Upload, X } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 
 const STEPS = ["Personal", "Body & Health", "Contact", "Account"];
 
@@ -262,11 +262,11 @@ const Signup = () => {
           <p className="text-center text-xs text-muted-foreground mb-4">{STEPS[step]}</p>
 
           <form onSubmit={handleSubmit}>
-            <ScrollArea className="max-h-[55vh]">
+            <div className="max-h-[55vh] overflow-y-auto pr-1 scrollbar-thin">
               <div className="px-1">
                 {renderStep()}
               </div>
-            </ScrollArea>
+            </div>
 
             {error && <p className="text-destructive text-sm mt-3">{error}</p>}
 
