@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import fitnessBg from "@/assets/fitness-bg.jpg";
 import { Eye, EyeOff, Dumbbell, ChevronLeft, ChevronRight, Upload, X } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 
 const STEPS = ["Personal", "Body & Health", "Contact", "Account"];
 
