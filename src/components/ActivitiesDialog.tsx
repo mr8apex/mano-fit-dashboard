@@ -18,6 +18,43 @@ const staticActivities = [
   { icon: Moon, label: "Sleep Duration", value: "6.5", target: "8 hrs", percent: 81, color: "text-indigo-400", bg: "bg-indigo-500/20" },
 ];
 
+// Animated counter hook
+const useAnimatedCount = (target: number, duration: number = 1200, active: boolean = true) => {
+  const [count, setCount] = useState(0);
+  const startTime = useRef<number | null>(null);
+  const rafId = useRef<number>(0);
+
+  useEffect(() => {
+    if (!active) { setCount(0); return; }
+    setCount(0);
+    startTime.current = null;
+
+    const animate = (timestamp: number) => {
+      if (!startTime.current) startTime.current = timestamp;
+      const elapsed = timestamp - startTime.current;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) {
+        rafId.current = requestAnimationFrame(animate);
+      }
+    };
+
+    // small delay so user sees the animation start from 0
+    const timeout = setTimeout(() => {
+      rafId.current = requestAnimationFrame(animate);
+    }, 150);
+
+    return () => {
+      clearTimeout(timeout);
+      cancelAnimationFrame(rafId.current);
+    };
+  }, [target, duration, active]);
+
+  return count;
+};
+
 // Confetti particle component
 const Confetti = ({ active }: { active: boolean }) => {
   if (!active) return null;
@@ -58,6 +95,60 @@ const Confetti = ({ active }: { active: boolean }) => {
   );
 };
 
+// Animated activity card
+const ActivityCard = ({
+  activity,
+  index,
+  dialogOpen,
+}: {
+  activity: typeof staticActivities[0];
+  index: number;
+  dialogOpen: boolean;
+}) => {
+  const animatedPercent = useAnimatedCount(activity.percent, 1000 + index * 150, dialogOpen);
+  const completed = animatedPercent >= 100;
+
+  return (
+    <div
+      className={`relative p-4 rounded-xl bg-muted/20 border space-y-2 transition-all duration-300 animate-fade-in ${
+        completed ? "border-primary/50 glow-box" : "border-glass-border/20"
+      }`}
+      style={{ animationDelay: `${index * 80}ms`, animationFillMode: "both" }}
+    >
+      <Confetti active={completed} />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className={`w-9 h-9 rounded-lg ${activity.bg} flex items-center justify-center ${completed ? "animate-scale-in" : ""}`}>
+            {completed ? (
+              <PartyPopper className="w-4 h-4 text-primary" />
+            ) : (
+              <activity.icon className={`w-4 h-4 ${activity.color}`} />
+            )}
+          </div>
+          <div>
+            <p className="text-sm font-semibold">{activity.label}</p>
+            <p className="text-xs text-muted-foreground">
+              {completed ? "🎉 Goal reached!" : `${activity.value} / ${activity.target}`}
+            </p>
+          </div>
+        </div>
+        <span className={`text-sm font-bold tabular-nums transition-colors duration-300 ${completed ? "text-primary" : activity.color}`}>
+          {animatedPercent}%
+        </span>
+      </div>
+      <div className="w-full h-1.5 rounded-full bg-muted/40 overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-colors duration-500 ${completed ? "bg-primary/40" : activity.bg}`}
+          style={{
+            width: `${animatedPercent}%`,
+            transition: "width 0.15s linear, background-color 0.5s",
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 const ActivitiesDialog = ({ open, onOpenChange }: Props) => {
   const [waterMl, setWaterMl] = useState(1500);
   const [linked, setLinked] = useState(false);
@@ -65,6 +156,7 @@ const ActivitiesDialog = ({ open, onOpenChange }: Props) => {
   const { toast } = useToast();
   const waterTarget = 2000;
   const waterPercent = Math.min(Math.round((waterMl / waterTarget) * 100), 100);
+  const animatedWater = useAnimatedCount(waterPercent, 800, open);
 
   const handleLink = () => {
     setLinked(true);
@@ -79,10 +171,6 @@ const ActivitiesDialog = ({ open, onOpenChange }: Props) => {
     }
   }, [waterPercent, celebrated, toast]);
 
-  const isCompleted = (label: string, percent: number) => {
-    return percent >= 100;
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="glass-strong border-glass-border/40 sm:max-w-md max-h-[85vh] overflow-hidden p-0">
@@ -92,7 +180,7 @@ const ActivitiesDialog = ({ open, onOpenChange }: Props) => {
         </DialogHeader>
 
         {/* Google Fit Link */}
-        <div className="p-4 rounded-xl bg-muted/20 border border-glass-border/20 flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-muted/20 border border-glass-border/20 flex items-center justify-between animate-fade-in">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-destructive/20 flex items-center justify-center">
               <Link2 className="w-4 h-4 text-destructive" />
@@ -108,55 +196,18 @@ const ActivitiesDialog = ({ open, onOpenChange }: Props) => {
         </div>
 
         <div className="space-y-3">
-          {staticActivities.map(a => {
-            const completed = isCompleted(a.label, a.percent);
-            return (
-              <div
-                key={a.label}
-                className={`relative p-4 rounded-xl bg-muted/20 border space-y-2 transition-all duration-300 ${
-                  completed
-                    ? "border-primary/50 glow-box"
-                    : "border-glass-border/20"
-                }`}
-              >
-                <Confetti active={completed} />
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-9 h-9 rounded-lg ${a.bg} flex items-center justify-center ${completed ? "animate-scale-in" : ""}`}>
-                      {completed ? (
-                        <PartyPopper className="w-4 h-4 text-primary" />
-                      ) : (
-                        <a.icon className={`w-4 h-4 ${a.color}`} />
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">{a.label}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {completed ? "🎉 Goal reached!" : `${a.value} / ${a.target}`}
-                      </p>
-                    </div>
-                  </div>
-                  <span className={`text-sm font-bold ${completed ? "text-primary" : a.color}`}>
-                    {a.percent}%
-                  </span>
-                </div>
-                <div className="w-full h-1.5 rounded-full bg-muted/40 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${completed ? "bg-primary/40" : a.bg}`}
-                    style={{ width: `${a.percent}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
+          {staticActivities.map((a, i) => (
+            <ActivityCard key={a.label} activity={a} index={i} dialogOpen={open} />
+          ))}
 
           {/* Water Intake with +/- */}
           <div
-            className={`relative p-4 rounded-xl bg-muted/20 border space-y-2 transition-all duration-300 ${
+            className={`relative p-4 rounded-xl bg-muted/20 border space-y-2 transition-all duration-300 animate-fade-in ${
               waterPercent >= 100
                 ? "border-primary/50 glow-box"
                 : "border-glass-border/20"
             }`}
+            style={{ animationDelay: `${staticActivities.length * 80}ms`, animationFillMode: "both" }}
           >
             <Confetti active={waterPercent >= 100} />
             <div className="flex items-center justify-between">
@@ -175,14 +226,17 @@ const ActivitiesDialog = ({ open, onOpenChange }: Props) => {
                   </p>
                 </div>
               </div>
-              <span className={`text-sm font-bold ${waterPercent >= 100 ? "text-primary" : "text-accent"}`}>
-                {waterPercent}%
+              <span className={`text-sm font-bold tabular-nums transition-colors duration-300 ${waterPercent >= 100 ? "text-primary" : "text-accent"}`}>
+                {animatedWater}%
               </span>
             </div>
             <div className="w-full h-1.5 rounded-full bg-muted/40 overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all duration-500 ${waterPercent >= 100 ? "bg-primary/40" : "bg-accent/20"}`}
-                style={{ width: `${waterPercent}%` }}
+                className={`h-full rounded-full transition-colors duration-500 ${waterPercent >= 100 ? "bg-primary/40" : "bg-accent/20"}`}
+                style={{
+                  width: `${animatedWater}%`,
+                  transition: "width 0.15s linear, background-color 0.5s",
+                }}
               />
             </div>
             <div className="flex items-center justify-center gap-3 pt-1">

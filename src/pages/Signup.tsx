@@ -262,11 +262,11 @@ const Signup = () => {
           <p className="text-center text-xs text-muted-foreground mb-4">{STEPS[step]}</p>
 
           <form onSubmit={handleSubmit}>
-            <ScrollArea className="max-h-[55vh]">
+            <div className="max-h-[55vh] overflow-y-auto pr-1 scrollbar-thin">
               <div className="px-1">
                 {renderStep()}
               </div>
-            </ScrollArea>
+            </div>
 
             {error && <p className="text-destructive text-sm mt-3">{error}</p>}
 
