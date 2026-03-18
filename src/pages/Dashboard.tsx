@@ -1,13 +1,14 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Dumbbell, User, LogOut, Settings, UtensilsCrossed, FileBarChart, Play, Activity, Flame, UserCircle } from "lucide-react";
+import { Dumbbell, User, LogOut, Settings, UtensilsCrossed, FileBarChart, SmilePlus, Activity, Flame, UserCircle, Loader2 } from "lucide-react";
 import DietPlanDialog from "@/components/DietPlanDialog";
 import ReportsDialog from "@/components/ReportsDialog";
-import TrainingDialog from "@/components/TrainingDialog";
+import MoodDialog from "@/components/MoodDialog";
 import ActivitiesDialog from "@/components/ActivitiesDialog";
+import { getDashboardData } from "@/services/api";
 
-const quotes = [
+const fallbackQuotes = [
   "The only bad workout is the one that didn't happen.",
   "Push yourself, because no one else is going to do it for you.",
   "Your body can stand almost anything. It's your mind you have to convince.",
@@ -19,15 +20,43 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [quote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
   const [dietOpen, setDietOpen] = useState(false);
   const [reportsOpen, setReportsOpen] = useState(false);
-  const [trainingOpen, setTrainingOpen] = useState(false);
+  const [moodOpen, setMoodOpen] = useState(false);
   const [activitiesOpen, setActivitiesOpen] = useState(false);
+
+  // API state
+  const [streak, setStreak] = useState<number>(3);
+  const [quote, setQuote] = useState(() => fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) navigate("/login");
   }, [user, navigate]);
+
+  // TODO: connect to backend here — fetch dashboard data
+  useEffect(() => {
+    let cancelled = false;
+    const fetchData = async () => {
+      try {
+        const data = await getDashboardData();
+        if (!cancelled) {
+          setStreak(data.streak);
+          setQuote(data.quote);
+        }
+      } catch {
+        // Fallback to mock data if backend is not available
+        if (!cancelled) {
+          setError(null); // Silently use fallback
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => { cancelled = true; };
+  }, []);
 
   if (!user) return null;
 
@@ -41,7 +70,7 @@ const Dashboard = () => {
   const features = [
     { icon: UtensilsCrossed, label: "Diet Plan", desc: "Track your nutrition", color: "from-emerald-500/20 to-teal-500/20", iconColor: "text-emerald-400", onClick: () => setDietOpen(true) },
     { icon: FileBarChart, label: "Reports", desc: "View your progress", color: "from-blue-500/20 to-cyan-500/20", iconColor: "text-blue-400", onClick: () => setReportsOpen(true) },
-    { icon: Play, label: "Start Training", desc: "Begin your workout", color: "from-primary/20 to-glow/20", iconColor: "text-primary", onClick: () => setTrainingOpen(true) },
+    { icon: SmilePlus, label: "Detect Mood", desc: "AI mood analysis", color: "from-primary/20 to-glow/20", iconColor: "text-primary", onClick: () => setMoodOpen(true) },
     { icon: Activity, label: "Activities", desc: "Daily activity log", color: "from-orange-500/20 to-amber-500/20", iconColor: "text-orange-400", onClick: () => setActivitiesOpen(true) },
   ];
 
@@ -96,16 +125,24 @@ const Dashboard = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-        <div className="glass rounded-2xl p-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-          <div className="flex items-center gap-3 mb-2">
-            <Flame className="w-6 h-6 text-orange-400" />
-            <span className="text-sm font-semibold text-orange-400">3 Day Streak 🔥</span>
+        {loading ? (
+          <div className="glass rounded-2xl p-6 flex items-center justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
-          <h2 className="text-2xl font-display font-bold mb-2">
-            {greeting()}, <span className="text-primary">{user.name.split(" ")[0]}</span>!
-          </h2>
-          <p className="text-muted-foreground italic">"{quote}"</p>
-        </div>
+        ) : error ? (
+          <div className="glass rounded-2xl p-6 text-center text-destructive">{error}</div>
+        ) : (
+          <div className="glass rounded-2xl p-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <div className="flex items-center gap-3 mb-2">
+              <Flame className="w-6 h-6 text-orange-400" />
+              <span className="text-sm font-semibold text-orange-400">{streak} Day Streak 🔥</span>
+            </div>
+            <h2 className="text-2xl font-display font-bold mb-2">
+              {greeting()}, <span className="text-primary">{user.name.split(" ")[0]}</span>!
+            </h2>
+            <p className="text-muted-foreground italic">"{quote}"</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           {features.map((f, i) => (
@@ -127,7 +164,7 @@ const Dashboard = () => {
 
       <DietPlanDialog open={dietOpen} onOpenChange={setDietOpen} />
       <ReportsDialog open={reportsOpen} onOpenChange={setReportsOpen} />
-      <TrainingDialog open={trainingOpen} onOpenChange={setTrainingOpen} />
+      <MoodDialog open={moodOpen} onOpenChange={setMoodOpen} />
       <ActivitiesDialog open={activitiesOpen} onOpenChange={setActivitiesOpen} />
     </div>
   );

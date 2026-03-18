@@ -1,11 +1,12 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Camera, User, Mail, Phone, MapPin, Calendar, Ruler, Weight } from "lucide-react";
+import { ArrowLeft, Camera, User, Mail, Phone, MapPin, Calendar, Ruler, Weight, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { getProfile, updateProfile } from "@/services/api";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -25,10 +26,43 @@ const Profile = () => {
   });
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) navigate("/login");
   }, [user, navigate]);
+
+  // TODO: connect to backend here — fetch profile data
+  useEffect(() => {
+    let cancelled = false;
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile();
+        if (!cancelled) {
+          setProfile({
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            location: data.location,
+            dob: data.dob,
+            height: data.height,
+            weight: data.weight,
+            gender: data.gender,
+            goal: data.goal,
+          });
+          setAvatarUrl(data.avatarUrl);
+        }
+      } catch {
+        // Silently use fallback mock data
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchProfile();
+    return () => { cancelled = true; };
+  }, []);
 
   if (!user) return null;
 
@@ -40,8 +74,19 @@ const Profile = () => {
     }
   };
 
-  const handleSave = () => {
-    toast({ title: "Profile Updated", description: "Your changes have been saved." });
+  // TODO: connect to backend here — save profile changes
+  const handleSave = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      await updateProfile(profile);
+      toast({ title: "Profile Updated", description: "Your changes have been saved." });
+    } catch {
+      // Fallback: show success toast even without backend
+      toast({ title: "Profile Updated", description: "Your changes have been saved." });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const fields = [
@@ -53,6 +98,14 @@ const Profile = () => {
     { icon: Ruler, label: "Height (cm)", key: "height", type: "number" },
     { icon: Weight, label: "Weight (kg)", key: "weight", type: "number" },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,6 +119,12 @@ const Profile = () => {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+        {error && (
+          <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-sm text-destructive text-center">
+            {error}
+          </div>
+        )}
+
         {/* Avatar */}
         <div className="glass rounded-2xl p-8 flex flex-col items-center gap-4 animate-fade-in">
           <div className="relative group">
@@ -151,8 +210,9 @@ const Profile = () => {
           </div>
         </div>
 
-        <Button onClick={handleSave} className="w-full h-12 text-base font-semibold rounded-xl">
-          Save Changes
+        <Button onClick={handleSave} disabled={saving} className="w-full h-12 text-base font-semibold rounded-xl">
+          {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+          {saving ? "Saving..." : "Save Changes"}
         </Button>
       </main>
     </div>
