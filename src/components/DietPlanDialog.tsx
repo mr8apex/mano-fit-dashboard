@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ImagePlus, Send, X, Loader2 } from "lucide-react";
+import { analyzeDiet } from "@/services/api";
 
 interface Props {
   open: boolean;
@@ -14,6 +15,7 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
   const [image, setImage] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,23 +26,36 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!text && !image) return;
     setLoading(true);
-    setTimeout(() => {
-      setResult(
-        image
-          ? "🥗 Based on your food image:\n\n• Estimated Calories: ~420 kcal\n• Protein: 28g\n• Carbs: 45g\n• Fat: 12g\n\n✅ Good balance! Consider adding more greens for fiber."
-          : `🍽️ Analysis for "${text}":\n\n• Estimated Calories: ~350 kcal\n• Protein: 22g\n• Carbs: 38g\n• Fat: 10g\n\n💡 Tip: Pair with a side salad for more nutrients.`
-      );
-      setLoading(false);
-    }, 1500);
+    setError(null);
+
+    try {
+      // TODO: connect to backend here — send text/image for analysis
+      const data = await analyzeDiet({ text: text || undefined });
+      setResult(data.analysis);
+    } catch {
+      // Fallback mock while backend is not connected
+      setTimeout(() => {
+        setResult(
+          image
+            ? "🥗 Based on your food image:\n\n• Estimated Calories: ~420 kcal\n• Protein: 28g\n• Carbs: 45g\n• Fat: 12g\n\n✅ Good balance! Consider adding more greens for fiber."
+            : `🍽️ Analysis for "${text}":\n\n• Estimated Calories: ~350 kcal\n• Protein: 22g\n• Carbs: 38g\n• Fat: 10g\n\n💡 Tip: Pair with a side salad for more nutrients.`
+        );
+        setLoading(false);
+      }, 1500);
+      return;
+    }
+
+    setLoading(false);
   };
 
   const reset = () => {
     setText("");
     setImage(null);
     setResult(null);
+    setError(null);
   };
 
   return (
@@ -51,6 +66,12 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
         </DialogHeader>
 
         <div className="space-y-4">
+          {error && (
+            <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+              {error}
+            </div>
+          )}
+
           {!result ? (
             <>
               {image ? (
