@@ -77,18 +77,44 @@ const Signup = () => {
     setStep(s => Math.max(s - 1, 0));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateStep()) return;
     if (hasDisease && !diseaseName.trim()) {
       setError("Please specify the disease name");
       return;
     }
-    const name = `${firstName} ${lastName}`.trim();
-    if (signup(name, email, password)) {
-      navigate("/dashboard");
-    } else {
-      setError("Signup failed. Please try again.");
+
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const res = await registerUser({
+        firstName,
+        lastName: lastName || undefined,
+        email,
+        password,
+        weight: Number(weight),
+        height: Number(height),
+        dateOfBirth,
+        gender,
+        address,
+        phoneNumber,
+        hasDisease,
+        diseaseName: hasDisease ? diseaseName : undefined,
+        profileImage: profileImage || undefined,
+      });
+
+      // Store token for OTP verification
+      if (res.token) {
+        localStorage.setItem("verify_token", res.token);
+        localStorage.setItem("verify_email", email);
+      }
+      navigate("/verify-otp");
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
