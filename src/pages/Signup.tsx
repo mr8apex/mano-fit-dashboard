@@ -24,7 +24,7 @@ const Signup = () => {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const { signup } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
