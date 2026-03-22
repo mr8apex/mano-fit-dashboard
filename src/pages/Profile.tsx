@@ -39,7 +39,7 @@ const Profile = () => {
     let cancelled = false;
     const fetchProfile = async () => {
       try {
-        const data = await getProfile();
+        const data = await getProfileData();
         if (!cancelled) {
           setProfile({
             name: data.name,
