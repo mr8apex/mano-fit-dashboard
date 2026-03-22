@@ -3,7 +3,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2, SmilePlus, ImagePlus, Mic, MicOff, X } from "lucide-react";
-import { detectMood } from "@/services/api";
+import { apiFetch } from "@/api/client";
+
+interface MoodResult {
+  mood: string;
+  recommendation: string;
+}
+
+// TODO: connect to backend here
+const detectMood = (payload: { text?: string; imageBase64?: string }): Promise<MoodResult> =>
+  apiFetch<MoodResult>("/mood/detect", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 
 interface Props {
   open: boolean;

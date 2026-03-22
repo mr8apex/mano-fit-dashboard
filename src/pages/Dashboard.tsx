@@ -6,7 +6,16 @@ import DietPlanDialog from "@/components/DietPlanDialog";
 import ReportsDialog from "@/components/ReportsDialog";
 import MoodDialog from "@/components/MoodDialog";
 import ActivitiesDialog from "@/components/ActivitiesDialog";
-import { getDashboardData } from "@/services/api";
+import { apiFetch } from "@/api/client";
+
+interface DashboardData {
+  streak: number;
+  quote: string;
+}
+
+// TODO: connect to backend here
+const getDashboardData = (): Promise<DashboardData> =>
+  apiFetch<DashboardData>("/dashboard");
 
 const fallbackQuotes = [
   "The only bad workout is the one that didn't happen.",

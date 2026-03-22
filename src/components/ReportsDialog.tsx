@@ -3,7 +3,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Loader2 } from "lucide-react";
-import { getReports } from "@/services/api";
+import { apiFetch } from "@/api/client";
+
+interface MacroData { name: string; value: number; color: string; }
+interface WeeklyData { week: string; weight: number; calories: number; workouts: number; }
+interface ReportsData { macros: MacroData[]; weekly: WeeklyData[]; }
+
+// TODO: connect to backend here
+const getReports = (): Promise<ReportsData> =>
+  apiFetch<ReportsData>("/reports");
 
 interface Props {
   open: boolean;

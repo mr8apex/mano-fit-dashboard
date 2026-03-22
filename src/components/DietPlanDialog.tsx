@@ -3,7 +3,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ImagePlus, Send, X, Loader2 } from "lucide-react";
-import { analyzeDiet } from "@/services/api";
+import { apiFetch } from "@/api/client";
+
+interface DietAnalysisResult {
+  analysis: string;
+}
+
+// TODO: connect to backend here
+const analyzeDiet = (payload: { text?: string; imageBase64?: string }): Promise<DietAnalysisResult> =>
+  apiFetch<DietAnalysisResult>("/diet/analyze", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 
 interface Props {
   open: boolean;

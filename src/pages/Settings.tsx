@@ -79,7 +79,11 @@ const Settings = () => {
   const toggle2FA = async (checked: boolean) => {
     setTwoFA(checked);
     try {
-      await apiToggle2FA(checked);
+      if (checked) {
+        await enable2FA();
+      } else {
+        await disable2FA();
+      }
     } catch {
       // Fallback — keep local state
     }

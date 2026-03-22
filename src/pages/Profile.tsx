@@ -79,7 +79,7 @@ const Profile = () => {
     setSaving(true);
     setError(null);
     try {
-      await updateProfile(profile);
+      await editProfile(profile);
       toast({ title: "Profile Updated", description: "Your changes have been saved." });
     } catch {
       // Fallback: show success toast even without backend
