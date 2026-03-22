@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import fitnessBg from "@/assets/fitness-bg.jpg";
-import { Eye, EyeOff, Dumbbell, ChevronLeft, ChevronRight, Upload, X } from "lucide-react";
-
+import { Eye, EyeOff, Dumbbell, ChevronLeft, ChevronRight, Upload, X, Loader2 } from "lucide-react";
+import { registerUser } from "@/api/auth.api";
 
 const STEPS = ["Personal", "Body & Health", "Contact", "Account"];
 
