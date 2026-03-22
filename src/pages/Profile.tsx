@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { getProfile, updateProfile } from "@/services/api";
+import { getProfileData, editProfile } from "@/api/user.api";
 
 const Profile = () => {
   const { user } = useAuth();
