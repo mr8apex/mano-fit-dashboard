@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { changePassword, changeEmail, toggle2FA as apiToggle2FA } from "@/services/api";
+import { changePassword, changeEmail, enable2FA, disable2FA } from "@/api/user.api";
 
 const Settings = () => {
   const { user } = useAuth();
