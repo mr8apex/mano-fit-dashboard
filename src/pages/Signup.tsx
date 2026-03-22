@@ -306,8 +306,9 @@ const Signup = () => {
                   Next <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (
-                <button type="submit" className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground font-display font-semibold hover:opacity-90 transition-opacity">
-                  Create Account
+                <button type="submit" disabled={submitting} className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground font-display font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
+                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {submitting ? "Creating..." : "Create Account"}
                 </button>
               )}
             </div>
