@@ -42,11 +42,11 @@ const Profile = () => {
         const data = await getProfileData();
         if (!cancelled) {
           setProfile({
-            name: data.name,
+            name: `${data.firstName} ${data.lastName || ""}`.trim(),
             email: data.email,
             phone: data.phone,
             location: data.location,
-            dob: data.dob,
+            dob: data.dateOfBirth,
             height: data.height,
             weight: data.weight,
             gender: data.gender,
