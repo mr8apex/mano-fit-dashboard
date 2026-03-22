@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import fitnessBg from "@/assets/fitness-bg.jpg";
-import { Eye, EyeOff, Dumbbell, ChevronLeft, ChevronRight, Upload, X } from "lucide-react";
-
+import { Eye, EyeOff, Dumbbell, ChevronLeft, ChevronRight, Upload, X, Loader2 } from "lucide-react";
+import { registerUser } from "@/api/auth.api";
 
 const STEPS = ["Personal", "Body & Health", "Contact", "Account"];
 
@@ -25,7 +24,7 @@ const Signup = () => {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const { signup } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,18 +77,44 @@ const Signup = () => {
     setStep(s => Math.max(s - 1, 0));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateStep()) return;
     if (hasDisease && !diseaseName.trim()) {
       setError("Please specify the disease name");
       return;
     }
-    const name = `${firstName} ${lastName}`.trim();
-    if (signup(name, email, password)) {
-      navigate("/dashboard");
-    } else {
-      setError("Signup failed. Please try again.");
+
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const res = await registerUser({
+        firstName,
+        lastName: lastName || undefined,
+        email,
+        password,
+        weight: Number(weight),
+        height: Number(height),
+        dateOfBirth,
+        gender,
+        address,
+        phoneNumber,
+        hasDisease,
+        diseaseName: hasDisease ? diseaseName : undefined,
+        profileImage: profileImage || undefined,
+      });
+
+      // Store token for OTP verification
+      if (res.token) {
+        localStorage.setItem("verify_token", res.token);
+        localStorage.setItem("verify_email", email);
+      }
+      navigate("/verify-otp");
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -281,8 +306,9 @@ const Signup = () => {
                   Next <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (
-                <button type="submit" className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground font-display font-semibold hover:opacity-90 transition-opacity">
-                  Create Account
+                <button type="submit" disabled={submitting} className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground font-display font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
+                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {submitting ? "Creating..." : "Create Account"}
                 </button>
               )}
             </div>

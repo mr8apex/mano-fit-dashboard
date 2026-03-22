@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { getProfile, updateProfile } from "@/services/api";
+import { getProfileData, editProfile } from "@/api/user.api";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -39,14 +39,14 @@ const Profile = () => {
     let cancelled = false;
     const fetchProfile = async () => {
       try {
-        const data = await getProfile();
+        const data = await getProfileData();
         if (!cancelled) {
           setProfile({
-            name: data.name,
+            name: `${data.firstName} ${data.lastName || ""}`.trim(),
             email: data.email,
             phone: data.phone,
             location: data.location,
-            dob: data.dob,
+            dob: data.dateOfBirth,
             height: data.height,
             weight: data.weight,
             gender: data.gender,
@@ -79,7 +79,7 @@ const Profile = () => {
     setSaving(true);
     setError(null);
     try {
-      await updateProfile(profile);
+      await editProfile(profile);
       toast({ title: "Profile Updated", description: "Your changes have been saved." });
     } catch {
       // Fallback: show success toast even without backend

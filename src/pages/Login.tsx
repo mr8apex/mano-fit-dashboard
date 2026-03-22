@@ -12,9 +12,10 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(email, password)) {
+    const success = await login(email, password);
+    if (success) {
       navigate("/dashboard");
     } else {
       setError("Invalid credentials. Try demo@example.com / demo123");
@@ -71,7 +72,10 @@ const Login = () => {
             </button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            <Link to="/forgot-password" className="text-primary hover:underline">Forgot Password?</Link>
+          </p>
+          <p className="text-center text-sm text-muted-foreground mt-2">
             Don't have an account?{" "}
             <Link to="/signup" className="text-primary hover:underline">Sign Up</Link>
           </p>

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { loginUser } from "@/api/auth.api";
 
 interface User {
   email: string;
@@ -8,7 +8,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
   signup: (name: string, email: string, password: string) => boolean;
   logout: () => void;
 }
@@ -27,14 +27,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return saved ? JSON.parse(saved) : null;
   });
 
-  const login = (email: string, password: string) => {
-    if (email === "demo@example.com" && password === "demo123") {
-      const u = { email, name: "Demo User" };
-      setUser(u);
-      sessionStorage.setItem("manofit_user", JSON.stringify(u));
-      return true;
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const res = await loginUser({ email, password });
+      if (res.token) {
+        localStorage.setItem("auth_token", res.token);
+        const u = {
+          email: res.user?.email || email,
+          name: res.user ? `${res.user.firstName} ${res.user.lastName || ""}`.trim() : email,
+        };
+        setUser(u);
+        sessionStorage.setItem("manofit_user", JSON.stringify(u));
+        return true;
+      }
+      return false;
+    } catch {
+      // Fallback for demo: allow demo credentials when backend is down
+      if (email === "demo@example.com" && password === "demo123") {
+        const u = { email, name: "Demo User" };
+        setUser(u);
+        sessionStorage.setItem("manofit_user", JSON.stringify(u));
+        return true;
+      }
+      return false;
     }
-    return false;
   };
 
   const signup = (name: string, email: string, password: string) => {
@@ -50,6 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setUser(null);
     sessionStorage.removeItem("manofit_user");
+    localStorage.removeItem("auth_token");
   };
 
   return (
