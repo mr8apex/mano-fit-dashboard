@@ -91,10 +91,10 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
 
           {!result ? (
             <>
-              {image ? (
+              {imagePreview ? (
                 <div className="relative rounded-xl overflow-hidden">
-                  <img src={image} alt="Food" className="w-full h-48 object-cover rounded-xl" />
-                  <button onClick={() => setImage(null)} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-background transition-colors">
+                  <img src={imagePreview} alt="Food" className="w-full h-48 object-cover rounded-xl" />
+                  <button onClick={() => { setImageFile(null); setImagePreview(null); }} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-background transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
