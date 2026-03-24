@@ -23,7 +23,8 @@ interface Props {
 
 const DietPlanDialog = ({ open, onOpenChange }: Props) => {
   const [text, setText] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
