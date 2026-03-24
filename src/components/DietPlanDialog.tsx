@@ -39,19 +39,23 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
   };
 
   const handleSubmit = async () => {
-    if (!text && !image) return;
+    if (!text && !imageFile) return;
     setLoading(true);
     setError(null);
 
     try {
-      // TODO: connect to backend here — send text/image for analysis
-      const data = await analyzeDiet({ text: text || undefined });
+      // TODO: connect to backend here — sends FormData with image and/or description
+      const formData = new FormData();
+      if (imageFile) formData.append("image", imageFile);
+      if (text) formData.append("description", text);
+
+      const data = await analyzeDiet(formData);
       setResult(data.analysis);
     } catch {
       // Fallback mock while backend is not connected
       setTimeout(() => {
         setResult(
-          image
+          imageFile
             ? "🥗 Based on your food image:\n\n• Estimated Calories: ~420 kcal\n• Protein: 28g\n• Carbs: 45g\n• Fat: 12g\n\n✅ Good balance! Consider adding more greens for fiber."
             : `🍽️ Analysis for "${text}":\n\n• Estimated Calories: ~350 kcal\n• Protein: 22g\n• Carbs: 38g\n• Fat: 10g\n\n💡 Tip: Pair with a side salad for more nutrients.`
         );
