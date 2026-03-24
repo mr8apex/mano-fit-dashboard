@@ -10,11 +10,11 @@ interface MoodResult {
   recommendation: string;
 }
 
-// TODO: connect to backend here
-const detectMood = (payload: { text?: string; imageBase64?: string }): Promise<MoodResult> =>
+// TODO: connect to backend here — sends FormData with ONE of: image, audio, or description
+const detectMood = (formData: FormData): Promise<MoodResult> =>
   apiFetch<MoodResult>("/mood/detect", {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
 interface Props {
@@ -24,7 +24,8 @@ interface Props {
 
 const MoodDialog = ({ open, onOpenChange }: Props) => {
   const [text, setText] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [result, setResult] = useState<string | null>(null);
@@ -37,7 +38,8 @@ const MoodDialog = ({ open, onOpenChange }: Props) => {
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -65,7 +67,7 @@ const MoodDialog = ({ open, onOpenChange }: Props) => {
     }
   };
 
-  const hasInput = text || image || audioBlob;
+  const hasInput = text || imageFile || audioBlob;
 
   const handleSubmit = async () => {
     if (!hasInput) return;
@@ -73,15 +75,20 @@ const MoodDialog = ({ open, onOpenChange }: Props) => {
     setError(null);
 
     try {
-      // TODO: connect to backend here — send text/image/audio for mood detection
-      const data = await detectMood({ text: text || undefined });
+      // TODO: connect to backend here — sends FormData with ONE of: image, audio, or description
+      const formData = new FormData();
+      if (imageFile) formData.append("image", imageFile);
+      else if (audioBlob) formData.append("audio", audioBlob, "recording.webm");
+      else if (text) formData.append("description", text);
+
+      const data = await detectMood(formData);
       setResult(`🧠 Detected Mood: ${data.mood}\n\n💡 ${data.recommendation}`);
     } catch {
       // Fallback mock while backend is not connected
       setTimeout(() => {
         const inputs: string[] = [];
         if (text) inputs.push("text");
-        if (image) inputs.push("facial expression");
+        if (imageFile) inputs.push("facial expression");
         if (audioBlob) inputs.push("voice tone");
 
         setResult(
@@ -105,7 +112,8 @@ const MoodDialog = ({ open, onOpenChange }: Props) => {
 
   const reset = () => {
     setText("");
-    setImage(null);
+    setImageFile(null);
+    setImagePreview(null);
     setAudioBlob(null);
     setResult(null);
     setError(null);
@@ -132,10 +140,10 @@ const MoodDialog = ({ open, onOpenChange }: Props) => {
           {!result ? (
             <>
               {/* Image upload */}
-              {image ? (
+              {imagePreview ? (
                 <div className="relative rounded-xl overflow-hidden">
-                  <img src={image} alt="Mood" className="w-full h-48 object-cover rounded-xl" />
-                  <button onClick={() => setImage(null)} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-background transition-colors">
+                  <img src={imagePreview} alt="Mood" className="w-full h-48 object-cover rounded-xl" />
+                  <button onClick={() => { setImageFile(null); setImagePreview(null); }} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-background transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 </div>

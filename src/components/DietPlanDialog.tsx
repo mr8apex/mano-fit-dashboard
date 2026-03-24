@@ -9,11 +9,11 @@ interface DietAnalysisResult {
   analysis: string;
 }
 
-// TODO: connect to backend here
-const analyzeDiet = (payload: { text?: string; imageBase64?: string }): Promise<DietAnalysisResult> =>
+// TODO: connect to backend here — sends FormData with image and/or description
+const analyzeDiet = (formData: FormData): Promise<DietAnalysisResult> =>
   apiFetch<DietAnalysisResult>("/diet/analyze", {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
 interface Props {
@@ -23,7 +23,8 @@ interface Props {
 
 const DietPlanDialog = ({ open, onOpenChange }: Props) => {
   const [text, setText] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,25 +33,29 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setImage(url);
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async () => {
-    if (!text && !image) return;
+    if (!text && !imageFile) return;
     setLoading(true);
     setError(null);
 
     try {
-      // TODO: connect to backend here — send text/image for analysis
-      const data = await analyzeDiet({ text: text || undefined });
+      // TODO: connect to backend here — sends FormData with image and/or description
+      const formData = new FormData();
+      if (imageFile) formData.append("image", imageFile);
+      if (text) formData.append("description", text);
+
+      const data = await analyzeDiet(formData);
       setResult(data.analysis);
     } catch {
       // Fallback mock while backend is not connected
       setTimeout(() => {
         setResult(
-          image
+          imageFile
             ? "🥗 Based on your food image:\n\n• Estimated Calories: ~420 kcal\n• Protein: 28g\n• Carbs: 45g\n• Fat: 12g\n\n✅ Good balance! Consider adding more greens for fiber."
             : `🍽️ Analysis for "${text}":\n\n• Estimated Calories: ~350 kcal\n• Protein: 22g\n• Carbs: 38g\n• Fat: 10g\n\n💡 Tip: Pair with a side salad for more nutrients.`
         );
@@ -64,7 +69,8 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
 
   const reset = () => {
     setText("");
-    setImage(null);
+    setImageFile(null);
+    setImagePreview(null);
     setResult(null);
     setError(null);
   };
@@ -85,10 +91,10 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
 
           {!result ? (
             <>
-              {image ? (
+              {imagePreview ? (
                 <div className="relative rounded-xl overflow-hidden">
-                  <img src={image} alt="Food" className="w-full h-48 object-cover rounded-xl" />
-                  <button onClick={() => setImage(null)} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-background transition-colors">
+                  <img src={imagePreview} alt="Food" className="w-full h-48 object-cover rounded-xl" />
+                  <button onClick={() => { setImageFile(null); setImagePreview(null); }} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-background transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -112,7 +118,7 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
                 />
               </div>
 
-              <Button onClick={handleSubmit} disabled={(!text && !image) || loading} className="w-full rounded-xl gap-2">
+              <Button onClick={handleSubmit} disabled={(!text && !imageFile) || loading} className="w-full rounded-xl gap-2">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 {loading ? "Analyzing..." : "Analyze"}
               </Button>
