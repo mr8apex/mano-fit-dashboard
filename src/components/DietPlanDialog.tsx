@@ -118,7 +118,7 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
                 />
               </div>
 
-              <Button onClick={handleSubmit} disabled={(!text && !image) || loading} className="w-full rounded-xl gap-2">
+              <Button onClick={handleSubmit} disabled={(!text && !imageFile) || loading} className="w-full rounded-xl gap-2">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 {loading ? "Analyzing..." : "Analyze"}
               </Button>
