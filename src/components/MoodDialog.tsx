@@ -112,7 +112,8 @@ const MoodDialog = ({ open, onOpenChange }: Props) => {
 
   const reset = () => {
     setText("");
-    setImage(null);
+    setImageFile(null);
+    setImagePreview(null);
     setAudioBlob(null);
     setResult(null);
     setError(null);

@@ -69,7 +69,8 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
 
   const reset = () => {
     setText("");
-    setImage(null);
+    setImageFile(null);
+    setImagePreview(null);
     setResult(null);
     setError(null);
   };
