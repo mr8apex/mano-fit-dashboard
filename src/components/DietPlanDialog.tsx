@@ -9,11 +9,11 @@ interface DietAnalysisResult {
   analysis: string;
 }
 
-// TODO: connect to backend here
-const analyzeDiet = (payload: { text?: string; imageBase64?: string }): Promise<DietAnalysisResult> =>
+// TODO: connect to backend here — sends FormData with image and/or description
+const analyzeDiet = (formData: FormData): Promise<DietAnalysisResult> =>
   apiFetch<DietAnalysisResult>("/diet/analyze", {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
 interface Props {
