@@ -33,8 +33,8 @@ const DietPlanDialog = ({ open, onOpenChange }: Props) => {
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setImage(url);
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
