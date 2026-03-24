@@ -24,7 +24,8 @@ interface Props {
 
 const MoodDialog = ({ open, onOpenChange }: Props) => {
   const [text, setText] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [result, setResult] = useState<string | null>(null);
