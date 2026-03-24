@@ -10,11 +10,11 @@ interface MoodResult {
   recommendation: string;
 }
 
-// TODO: connect to backend here
-const detectMood = (payload: { text?: string; imageBase64?: string }): Promise<MoodResult> =>
+// TODO: connect to backend here — sends FormData with ONE of: image, audio, or description
+const detectMood = (formData: FormData): Promise<MoodResult> =>
   apiFetch<MoodResult>("/mood/detect", {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
 interface Props {
