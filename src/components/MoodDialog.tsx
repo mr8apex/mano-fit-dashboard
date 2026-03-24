@@ -67,7 +67,7 @@ const MoodDialog = ({ open, onOpenChange }: Props) => {
     }
   };
 
-  const hasInput = text || image || audioBlob;
+  const hasInput = text || imageFile || audioBlob;
 
   const handleSubmit = async () => {
     if (!hasInput) return;
@@ -75,15 +75,20 @@ const MoodDialog = ({ open, onOpenChange }: Props) => {
     setError(null);
 
     try {
-      // TODO: connect to backend here — send text/image/audio for mood detection
-      const data = await detectMood({ text: text || undefined });
+      // TODO: connect to backend here — sends FormData with ONE of: image, audio, or description
+      const formData = new FormData();
+      if (imageFile) formData.append("image", imageFile);
+      else if (audioBlob) formData.append("audio", audioBlob, "recording.webm");
+      else if (text) formData.append("description", text);
+
+      const data = await detectMood(formData);
       setResult(`🧠 Detected Mood: ${data.mood}\n\n💡 ${data.recommendation}`);
     } catch {
       // Fallback mock while backend is not connected
       setTimeout(() => {
         const inputs: string[] = [];
         if (text) inputs.push("text");
-        if (image) inputs.push("facial expression");
+        if (imageFile) inputs.push("facial expression");
         if (audioBlob) inputs.push("voice tone");
 
         setResult(
