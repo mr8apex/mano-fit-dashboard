@@ -52,12 +52,15 @@ export interface GenericSuccess {
 export const getProfileData = (): Promise<UserProfile> =>
   apiFetch<UserProfile>("/user/profileData");
 
-/** PUT /user/editProfile */
-export const editProfile = (data: EditProfilePayload): Promise<GenericSuccess> =>
-  apiFetch<GenericSuccess>("/user/editProfile", {
+/** PUT /user/editProfile (FormData for file upload support) */
+export const editProfile = (data: EditProfilePayload | FormData): Promise<GenericSuccess> => {
+  const isFormData = data instanceof FormData;
+  return apiFetch<GenericSuccess>("/user/editProfile", {
     method: "PUT",
-    body: JSON.stringify(data),
+    body: isFormData ? data : JSON.stringify(data),
+    ...(isFormData ? { headers: {} } : {}),
   });
+};
 
 /** PUT /user/changePassword */
 export const changePassword = (data: ChangePasswordPayload): Promise<GenericSuccess> =>
