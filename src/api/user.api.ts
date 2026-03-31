@@ -10,14 +10,14 @@ export interface UserProfile {
   firstName: string;
   lastName?: string;
   email: string;
-  phone: string;
-  location: string;
-  dateOfBirth: string;
-  height: string;
-  weight: string;
+  phoneNumber: string;
+  address: string;
+  age: number;
+  height: number;
+  weight: number;
   gender: string;
-  goal: string;
-  avatarUrl: string | null;
+  mealType: string;
+  profileImageUrl: string | null;
   hasDisease: boolean;
   diseaseName?: string;
 }
@@ -25,13 +25,11 @@ export interface UserProfile {
 export interface EditProfilePayload {
   firstName?: string;
   lastName?: string;
-  phone?: string;
-  location?: string;
-  dateOfBirth?: string;
-  height?: string;
-  weight?: string;
-  gender?: string;
-  goal?: string;
+  phoneNumber?: string;
+  address?: string;
+  height?: number;
+  weight?: number;
+  mealType?: string;
 }
 
 export interface ChangePasswordPayload {
