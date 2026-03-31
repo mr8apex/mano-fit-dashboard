@@ -10,14 +10,14 @@ export interface UserProfile {
   firstName: string;
   lastName?: string;
   email: string;
-  phone: string;
-  location: string;
-  dateOfBirth: string;
-  height: string;
-  weight: string;
+  phoneNumber: string;
+  address: string;
+  age: number;
+  height: number;
+  weight: number;
   gender: string;
-  goal: string;
-  avatarUrl: string | null;
+  mealType: string;
+  profileImageUrl: string | null;
   hasDisease: boolean;
   diseaseName?: string;
 }
@@ -25,13 +25,11 @@ export interface UserProfile {
 export interface EditProfilePayload {
   firstName?: string;
   lastName?: string;
-  phone?: string;
-  location?: string;
-  dateOfBirth?: string;
-  height?: string;
-  weight?: string;
-  gender?: string;
-  goal?: string;
+  phoneNumber?: string;
+  address?: string;
+  height?: number;
+  weight?: number;
+  mealType?: string;
 }
 
 export interface ChangePasswordPayload {
@@ -54,12 +52,15 @@ export interface GenericSuccess {
 export const getProfileData = (): Promise<UserProfile> =>
   apiFetch<UserProfile>("/user/profileData");
 
-/** PUT /user/editProfile */
-export const editProfile = (data: EditProfilePayload): Promise<GenericSuccess> =>
-  apiFetch<GenericSuccess>("/user/editProfile", {
+/** PUT /user/editProfile (FormData for file upload support) */
+export const editProfile = (data: EditProfilePayload | FormData): Promise<GenericSuccess> => {
+  const isFormData = data instanceof FormData;
+  return apiFetch<GenericSuccess>("/user/editProfile", {
     method: "PUT",
-    body: JSON.stringify(data),
+    body: isFormData ? data : JSON.stringify(data),
+    ...(isFormData ? { headers: {} } : {}),
   });
+};
 
 /** PUT /user/changePassword */
 export const changePassword = (data: ChangePasswordPayload): Promise<GenericSuccess> =>
