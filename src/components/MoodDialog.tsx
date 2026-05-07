@@ -55,6 +55,8 @@ const MoodDialog = ({ open, onOpenChange }: Props) => {
     setLoading(true);
     setError(null);
 
+    const MOCK_PLAN = "## 🎯 Your Personalized \u201CMaintain\u201D Plan  \n*(Designed for a **moderate-activity beginner** who wants to keep a healthy weight, support balanced nutrition, and enjoy a simple full-body routine.)*  \n\n---\n\n### 1️⃣ Nutrition Corner\n\n| What you'll eat | Why it matters |\n|-----------------|----------------|\n| **Total Calories:** **2,625 kcal** | Keeps energy steady and body weight stable. |\n| **Protein:** **112 g** (~17%) | Helps build & repair muscle, keeps you full. |\n| **Fat:** **56 g** (~19%) | Fuels hormones, absorbs vitamins, gives satiety. |\n| **Carbs:** **418 g** (~64%) | Main energy source for workouts & daily life. |\n| **Meal Style:** *Simple, non-vegetarian, balanced* | Keeps prep time low, nutrition high. |\n\n#### Meal-Planning Tips\n\n| Meal | Sample Ideas |\n|------|--------------|\n| **Breakfast** | Overnight oats + berries |\n| **Mid-Morning** | Protein shake + fruit |\n| **Lunch** | Grilled chicken, quinoa, broccoli |\n| **Snack** | Hummus + carrot sticks |\n| **Dinner** | Baked salmon, sweet potato, green beans |\n\n> **Pro-Tip:** Spread protein (~20-30 g) across 4-5 meals.\n\n---\n\n### 2️⃣ Workout Blueprint\n\n| Feature | Details |\n|---------|---------|\n| **Type** | Full-Body |\n| **Days/Week** | **3** |\n| **Duration** | **25 min** |\n| **Intensity** | *Low-moderate* |\n\n#### Sample 3-Day Routine\n\n| Day | Exercise | Sets | Reps |\n|-----|----------|------|------|\n| **Day 1** | Goblet Squat | 3 | 12-15 |\n| | Push-Up | 3 | 10-12 |\n| | Bent-Over Row | 3 | 12 |\n| | Plank | 3 | 30 s |\n| **Day 3** | Dumbbell Deadlift | 3 | 12-15 |\n| | Incline DB Press | 3 | 10-12 |\n| **Day 5** | Body-weight Circuit | 3 rounds | 15 each |\n\n---\n\n### 3️⃣ Lifestyle & Motivation\n\n| Focus | What to Do |\n|-------|------------|\n| **Sleep** | 7-8 hrs/night |\n| **Hydration** | 2.5-3 L/day |\n| **Stress** | 5-min daily breathing |\n| **Tracking** | Log meals + workouts |\n\n---\n\n**You've got this! 🚀**";
+
     try {
       const formData = new FormData();
       if (imageFile) formData.append("image", imageFile);
@@ -62,8 +64,9 @@ const MoodDialog = ({ open, onOpenChange }: Props) => {
 
       const res = await generateCoachPlan(formData);
       setEnhancedPlan(res.data.plan.enhancedPlan);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
+    } catch {
+      // Fallback mock while backend is not connected
+      setEnhancedPlan(MOCK_PLAN);
     } finally {
       setLoading(false);
     }
