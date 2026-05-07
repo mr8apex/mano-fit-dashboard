@@ -79,7 +79,7 @@ const Dashboard = () => {
   const features = [
     { icon: UtensilsCrossed, label: "Diet Plan", desc: "Track your nutrition", color: "from-emerald-500/20 to-teal-500/20", iconColor: "text-emerald-400", onClick: () => setDietOpen(true) },
     { icon: FileBarChart, label: "Reports", desc: "View your progress", color: "from-blue-500/20 to-cyan-500/20", iconColor: "text-blue-400", onClick: () => setReportsOpen(true) },
-    { icon: SmilePlus, label: "Detect Mood", desc: "AI mood analysis", color: "from-primary/20 to-glow/20", iconColor: "text-primary", onClick: () => setMoodOpen(true) },
+    { icon: SmilePlus, label: "AI Coach Plan", desc: "Personalized diet & workout", color: "from-primary/20 to-glow/20", iconColor: "text-primary", onClick: () => setMoodOpen(true) },
     { icon: Activity, label: "Activities", desc: "Daily activity log", color: "from-orange-500/20 to-amber-500/20", iconColor: "text-orange-400", onClick: () => setActivitiesOpen(true) },
   ];
 
